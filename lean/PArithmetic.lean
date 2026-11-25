@@ -187,6 +187,10 @@ theorem pMul_horizon_left {N : Nat} (hN : 0 < N) (b : Nat) (hb : 0 < b) :
       simp only [pMul]
       exact pAdd_horizon_right hN _
 
+/-- Unfolding step for `pMul` on `j + 2`. -/
+theorem pMul_step {N : Nat} (hN : 0 < N) (a : PNum N) (j : Nat) :
+    pMul hN a (j + 2) = pAdd hN (pMul hN a (j + 1)) a := rfl
+
 /-- Theorem 13: Fixed-point soundness of early termination in `pMul`. -/
 theorem pMul_saturates {N : Nat} (hN : 0 < N) (a : PNum N) (k : Nat)
     (h_fix : (pAdd hN (pMul hN a (k + 1)) a).val = (pMul hN a (k + 1)).val) :
@@ -195,8 +199,12 @@ theorem pMul_saturates {N : Nat} (hN : 0 < N) (a : PNum N) (k : Nat)
   induction m with
   | zero => rfl
   | succ m ih =>
-    have h_eq : pMul hN a (k + 1 + m) = pMul hN a (k + 1) := PNum.ext ih
-    show (pAdd hN (pMul hN a (k + 1 + m)) a).val = (pMul hN a (k + 1)).val
+    have h_idx : k + 1 + (m + 1) = (k + m) + 2 := by omega
+    have h_prev : k + 1 + m = (k + m) + 1 := by omega
+    rw [h_idx, pMul_step]
+    have h_eq : pMul hN a ((k + m) + 1) = pMul hN a (k + 1) := by
+      rw [← h_prev]
+      exact PNum.ext ih
     rw [h_eq]
     exact h_fix
 
