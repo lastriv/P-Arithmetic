@@ -7,7 +7,14 @@ authors:
     given-names: Ilya
     email: ilya.v.radkevich@gmail.com
     orcid: "https://orcid.org/0009-0001-4099-2572"
-doi: 10.5281/zenodo.24538223
+doi: 10.5281/zenodo.24543223
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.24543223
+    description: Software release on Zenodo
+  - type: doi
+    value: 10.5281/zenodo.24538223
+    description: Preprint paper on Zenodo
 repository-code: "https://github.com/lastriv/P-Arithmetic"
 url: "https://github.com/lastriv/P-Arithmetic"
 license: CC-BY-4.0

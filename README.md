@@ -1,6 +1,7 @@
 # $\mathcal{P}$-Arithmetic
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24538223.svg)](https://doi.org/10.5281/zenodo.24538223)
+[![Software DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24543223.svg)](https://doi.org/10.5281/zenodo.24543223)
+[![Paper DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24538223.svg)](https://doi.org/10.5281/zenodo.24538223)
 [![ORCID](https://img.shields.io/badge/ORCID-0009--0001--4099--2572-a6ce39.svg)](https://orcid.org/0009-0001-4099-2572)
 [![CI](https://github.com/lastriv/P-Arithmetic/actions/workflows/ci.yml/badge.svg)](https://github.com/lastriv/P-Arithmetic/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -113,7 +114,7 @@ P-Arithmetic/
 
 ## Citation
 
-If you use this work, please cite the paper and Zenodo record:
+If you use this work, please cite the paper (`10.5281/zenodo.24538223`) and software release (`10.5281/zenodo.24543223`):
 
 ```bibtex
 @misc{radkevich2026parithmetic,
@@ -122,6 +123,16 @@ If you use this work, please cite the paper and Zenodo record:
   year         = {2026},
   month        = nov,
   doi          = {10.5281/zenodo.24538223},
+  url          = {https://github.com/lastriv/P-Arithmetic}
+}
+
+@software{radkevich2026parithmetic_code,
+  author       = {Radkevich, Ilya},
+  title        = {P-Arithmetic: Python Library, Specification, Plots, and Lean 4 Formalization},
+  year         = {2026},
+  month        = nov,
+  version      = {v0.1.0},
+  doi          = {10.5281/zenodo.24543223},
   url          = {https://github.com/lastriv/P-Arithmetic}
 }
 ```
