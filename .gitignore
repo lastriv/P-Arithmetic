@@ -10,3 +10,8 @@ venv/
 .DS_Store
 Thumbs.db
 lean/.lake/
+
+# Agent bus (local) and personal settings
+.agents/
+.claude/settings.local.json
+.worktrees/
