@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "p-arithmetic"
+version = "0.1.0"
+description = "Physically Bounded Non-Associative Arithmetic (P-Arithmetic): Python reference implementation and specification"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "CC-BY-4.0" }
+authors = [
+  { name = "Ilya Radkevich", email = "ilya.v.radkevich@gmail.com" }
+]
+keywords = ["ultrafinitism", "non-associative-arithmetic", "planck-scale", "cosmology", "physics"]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/lastriv/P-Arithmetic"
+Repository = "https://github.com/lastriv/P-Arithmetic"
+Specification = "https://github.com/lastriv/P-Arithmetic/blob/main/SPEC.md"
+
+[tool.setuptools]
+py-modules = ["p_arithmetic"]

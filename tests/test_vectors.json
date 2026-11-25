@@ -1,0 +1,17 @@
+{
+  "p_add": [
+    {"a": 0, "b": 1, "n_max": 100, "expected": 1},
+    {"a": 1, "b": 1, "n_max": 100, "expected": 1},
+    {"a": 3, "b": 4, "n_max": 1000, "expected": 6},
+    {"a": 100, "b": 42, "n_max": 100, "expected": 100},
+    {"a": 99, "b": 1, "n_max": 100, "expected": 99},
+    {"a": 31, "b": 47, "n_max": 100, "expected": 68},
+    {"a": 68, "b": 83, "n_max": 100, "expected": 96},
+    {"a": 47, "b": 83, "n_max": 100, "expected": 93}
+  ],
+  "p_mul": [
+    {"a": 7, "b": 0, "n_max": 100, "expected": 0},
+    {"a": 3, "b": 4, "n_max": 1000, "expected": 9},
+    {"a": 20, "b": 1000, "n_max": 100, "expected": 97}
+  ]
+}
