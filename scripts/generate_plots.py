@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from xml.sax.saxutils import escape as xml_escape
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -27,7 +28,7 @@ from p_arithmetic import (
     saturation_threshold,
 )
 
-PLOTS_DIR = Path(__file__).resolve().parent.parent / "plots"
+PLOTS_DIR = ROOT_DIR / "plots"
 
 WIDTH = 760
 HEIGHT = 460
@@ -70,23 +71,23 @@ def _svg_shell(
     lines = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}">',
         '<rect width="100%" height="100%" fill="#ffffff" />',
-        f'<text x="{WIDTH / 2:.1f}" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15.5" font-weight="600" fill="#111827">{title}</text>',
+        f'<text x="{WIDTH / 2:.1f}" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15.5" font-weight="600" fill="#111827">{xml_escape(title)}</text>',
     ]
 
     for xv, lbl in x_ticks:
         px = _map_x(xv, x_min, x_max)
         lines.append(f'<line x1="{px:.2f}" y1="{PAD_T}" x2="{px:.2f}" y2="{PAD_T + PLOT_H}" stroke="#e5e7eb" stroke-width="1" />')
-        lines.append(f'<text x="{px:.2f}" y="{PAD_T + PLOT_H + 18}" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#4b5563">{lbl}</text>')
+        lines.append(f'<text x="{px:.2f}" y="{PAD_T + PLOT_H + 18}" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#4b5563">{xml_escape(lbl)}</text>')
 
     for yv, lbl in y_ticks:
         py = _map_y(yv, y_min, y_max)
         lines.append(f'<line x1="{PAD_L}" y1="{py:.2f}" x2="{PAD_L + PLOT_W}" y2="{py:.2f}" stroke="#e5e7eb" stroke-width="1" />')
-        lines.append(f'<text x="{PAD_L - 8}" y="{py + 4:.2f}" text-anchor="end" font-family="system-ui, sans-serif" font-size="11" fill="#4b5563">{lbl}</text>')
+        lines.append(f'<text x="{PAD_L - 8}" y="{py + 4:.2f}" text-anchor="end" font-family="system-ui, sans-serif" font-size="11" fill="#4b5563">{xml_escape(lbl)}</text>')
 
     lines.append(f'<rect x="{PAD_L}" y="{PAD_T}" width="{PLOT_W}" height="{PLOT_H}" fill="none" stroke="#374151" stroke-width="1.2" />')
-    lines.append(f'<text x="{PAD_L + PLOT_W / 2:.1f}" y="{HEIGHT - 14}" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#1f2937">{x_label}</text>')
+    lines.append(f'<text x="{PAD_L + PLOT_W / 2:.1f}" y="{HEIGHT - 14}" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#1f2937">{xml_escape(x_label)}</text>')
     lines.append(
-        f'<text x="18" y="{PAD_T + PLOT_H / 2:.1f}" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#1f2937" transform="rotate(-90 18 {PAD_T + PLOT_H / 2:.1f})">{y_label}</text>'
+        f'<text x="18" y="{PAD_T + PLOT_H / 2:.1f}" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#1f2937" transform="rotate(-90 18 {PAD_T + PLOT_H / 2:.1f})">{xml_escape(y_label)}</text>'
     )
 
     lines.extend(body)
@@ -101,7 +102,7 @@ def _svg_shell(
             cy = ly + 18 + idx * 20
             dash_attr = f' stroke-dasharray="{dash}"' if dash else ""
             lines.append(f'<line x1="{lx + 10}" y1="{cy}" x2="{lx + 34}" y2="{cy}" stroke="{color}" stroke-width="2.5"{dash_attr} />')
-            lines.append(f'<text x="{lx + 42}" y="{cy + 4}" font-family="system-ui, sans-serif" font-size="11" fill="#111827">{label}</text>')
+            lines.append(f'<text x="{lx + 42}" y="{cy + 4}" font-family="system-ui, sans-serif" font-size="11" fill="#111827">{xml_escape(label)}</text>')
 
     lines.append("</svg>")
     return "\n".join(lines)
@@ -112,50 +113,64 @@ def find_first_associativity_break(n_max: int) -> tuple[int, int, int, int] | No
     for s in range(1, n_max + 1):
         for a in range(1, s + 1):
             for b in range(a, s + 1):
-                for c in (s,):
-                    d1 = associativity_defect(a, b, c, n_max)
-                    if d1 > 0:
-                        return (a, b, c, d1)
-                    d2 = associativity_defect(a, c, b, n_max)
-                    if d2 > 0:
-                        return (a, c, b, d2)
-                    d3 = associativity_defect(c, a, b, n_max)
-                    if d3 > 0:
-                        return (c, a, b, d3)
-    return None
-
-
-def find_first_symmetric_break(n_max: int) -> int | None:
-    """Find the smallest a where (a (+) a) (+) a != a (+) (a (+) a)."""
-    for a in range(1, n_max + 1):
-        if associativity_defect(a, a, a, n_max) > 0:
-            return a
+                c = s
+                d1 = associativity_defect(a, b, c, n_max)
+                if d1 > 0:
+                    return (a, b, c, d1)
+                d2 = associativity_defect(a, c, b, n_max)
+                if d2 > 0:
+                    return (a, c, b, d2)
+                d3 = associativity_defect(c, a, b, n_max)
+                if d3 > 0:
+                    return (c, a, b, d3)
     return None
 
 
 def plot_associativity_threshold() -> tuple[tuple[int, int, int, int] | None, float]:
-    """Sweep scale S in [1, 100] for N_max = 100 and plot non-associative fraction."""
+    """Incrementally sweep scale S in [1, 100] in O(N^3) and plot non-associative fraction."""
     n_max = 100
+    n_sq = n_max * n_max
     first_break = find_first_associativity_break(n_max)
 
-    # Compute fraction of triples (a, b, c) in [1, S]^3 with defect > 0
-    # Use symmetry: associativity_defect(a, b, c) == associativity_defect(c, b, a)
-    xs = list(range(1, n_max + 1, 2))
-    if xs[-1] != n_max:
-        xs.append(n_max)
+    # Precompute addition table for [0..n_max]^2 for fast O(N^3) incremental shell sweep.
+    add_tbl = [
+        [((a + b) * n_sq) // (n_sq + a * b) for b in range(n_max + 1)]
+        for a in range(n_max + 1)
+    ]
 
+    broken_cum = 0
     frac_pts: list[tuple[float, float]] = []
     max_frac = 0.0
-    for s in xs:
-        broken = 0
+
+    for s in range(1, n_max + 1):
+        # Count newly added triples (a, b, c) in [1, s]^3 with max(a, b, c) == s:
+        # 1) c == s, a in [1, s-1], b in [1, s-1]  (symmetric with a == s, c in [1, s-1], b in [1, s-1])
+        row_s = add_tbl[s]
+        for a in range(1, s):
+            row_a = add_tbl[a]
+            for b in range(1, s):
+                # (a, b, s) and (s, b, a) have identical associativity defect by commutativity
+                if add_tbl[row_a[b]][s] != row_a[add_tbl[b][s]]:
+                    broken_cum += 2
+        # 2) b == s, a in [1, s-1], c in [1, s-1]
+        for a in range(1, s):
+            row_a = add_tbl[a]
+            as_val = row_a[s]
+            row_as = add_tbl[as_val]
+            for c in range(1, s):
+                if row_as[c] != row_a[row_s[c]]:
+                    broken_cum += 1
+        # 3) Exactly two coordinates equal s: (s, s, k), (k, s, s), (s, k, s) for k in [1, s-1]
+        ss = row_s[s]
+        row_ss = add_tbl[ss]
+        for k in range(1, s):
+            # (s, s, k) and (k, s, s) share identical defect; (s, k, s) is always associative by commutativity
+            if row_ss[k] != row_s[row_s[k]]:
+                broken_cum += 2
+        # 4) (s, s, s) is always associative by commutativity.
+
         total = s * s * s
-        for a in range(1, s + 1):
-            for b in range(1, s + 1):
-                ab = p_add(a, b, n_max)
-                for c in range(1, s + 1):
-                    if p_add(ab, c, n_max) != p_add(a, p_add(b, c, n_max), n_max):
-                        broken += 1
-        frac = (broken / total) * 100.0
+        frac = (broken_cum / total) * 100.0
         max_frac = max(max_frac, frac)
         frac_pts.append((_map_x(s, 0, n_max), _map_y(frac, 0, 100)))
 
@@ -163,14 +178,15 @@ def plot_associativity_threshold() -> tuple[tuple[int, int, int, int] | None, fl
     if first_break is not None:
         bx = _map_x(max(first_break[:3]), 0, n_max)
         body.append(f'<line x1="{bx:.2f}" y1="{PAD_T}" x2="{bx:.2f}" y2="{PAD_T + PLOT_H}" stroke="#dc2626" stroke-width="1.6" stroke-dasharray="6,4" />')
+        label = xml_escape(f"Threshold S={max(first_break[:3])} {first_break[:3]}")
         body.append(
-            f'<text x="{bx + 6:.2f}" y="{PAD_T + 26}" font-family="system-ui, sans-serif" font-size="11" font-weight="600" fill="#dc2626">Threshold S={max(first_break[:3])} {first_break[:3]}</text>'
+            f'<text x="{bx + 6:.2f}" y="{PAD_T + 26}" font-family="system-ui, sans-serif" font-size="11" font-weight="600" fill="#dc2626">{label}</text>'
         )
 
     body.append(_polyline(frac_pts, "#7c3aed", 2.5))
 
     svg = _svg_shell(
-        title="Exact Associativity-Breaking Threshold &amp; Non-Associative Fraction (N_max = 100)",
+        title="Exact Associativity-Breaking Threshold & Non-Associative Fraction (N_max = 100)",
         x_label="Scale bound S (triples a, b, c in [1, S])",
         y_label="Non-associative triples (%)",
         x_ticks=[(0, "0"), (20, "20"), (40, "40"), (60, "60"), (80, "80"), (100, "100")],
@@ -310,7 +326,7 @@ def plot_bounded_mass_energy() -> None:
         _polyline(discrete_pts, "#059669", 2.5),
     ]
     svg = _svg_shell(
-        title="Bounded Mass-Energy: k (x) (mc^2) vs. Classical k * mc^2 (E_max = 1000, mc^2 = 25)",
+        title="Bounded Mass-Energy: (mc^2) (x) k vs. Classical k * mc^2 (E_max = 1000, mc^2 = 25)",
         x_label="Particle count k",
         y_label="Total energy E_total",
         x_ticks=[(0, "0"), (40, "40"), (80, "80"), (120, "120")],
@@ -322,7 +338,7 @@ def plot_bounded_mass_energy() -> None:
         body=body,
         legend=[
             ("Classical: k * mc^2", "#9ca3af", "4,4"),
-            ("Discrete: k (x) (mc^2)", "#059669", ""),
+            ("Discrete: (mc^2) (x) k", "#059669", ""),
             ("Continuum: floor(E_max * tanh(...))", "#f59e0b", "5,3"),
             ("Energy horizon E_max = 1000", "#dc2626", "6,4"),
         ],
@@ -334,8 +350,6 @@ def main() -> None:
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
     first_100, max_frac_100 = plot_associativity_threshold()
     first_1000 = find_first_associativity_break(1000)
-    sym_100 = find_first_symmetric_break(100)
-    sym_1000 = find_first_symmetric_break(1000)
 
     plot_p_addition_saturation()
     plot_associativity_defect()
@@ -343,8 +357,8 @@ def main() -> None:
     plot_bounded_mass_energy()
 
     print("=== Computational Experiment Results ===")
-    print(f"N_max = 100 : saturation_threshold = {saturation_threshold(100)}, first_asym_break = {first_100}, first_sym_break = {sym_100}, max_non_assoc_pct = {max_frac_100:.2f}%")
-    print(f"N_max = 1000: saturation_threshold = {saturation_threshold(1000)}, first_asym_break = {first_1000}, first_sym_break = {sym_1000}")
+    print(f"N_max = 100 : saturation_threshold = {saturation_threshold(100)}, first_asym_break = {first_100}, max_non_assoc_pct = {max_frac_100:.2f}%")
+    print(f"N_max = 1000: saturation_threshold = {saturation_threshold(1000)}, first_asym_break = {first_1000}")
     print(f"Generated 5 SVG plots in {PLOTS_DIR}")
 
 

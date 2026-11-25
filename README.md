@@ -3,7 +3,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24538223.svg)](https://doi.org/10.5281/zenodo.24538223)
 [![ORCID](https://img.shields.io/badge/ORCID-0009--0001--4099--2572-a6ce39.svg)](https://orcid.org/0009-0001-4099-2572)
 [![CI](https://github.com/lastriv/P-Arithmetic/actions/workflows/ci.yml/badge.svg)](https://github.com/lastriv/P-Arithmetic/actions/workflows/ci.yml)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 **Physically Bounded Non-Associative Arithmetic ($\mathcal{P}$-Arithmetic): Replacing Actual Infinity with Relativistic and Planckian Constraints.**
@@ -105,7 +105,7 @@ P-Arithmetic/
 │   ├── test_p_arithmetic.py
 │   └── test_vectors.json # Machine-readable conformance vectors
 ├── .github/workflows/
-│   └── ci.yml            # Python (3.9-3.13) & Lean 4 CI
+│   └── ci.yml            # Python (3.10-3.13) & Lean 4 CI
 └── pyproject.toml
 ```
 

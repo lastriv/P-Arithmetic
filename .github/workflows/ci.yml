@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   python-tests:
     runs-on: ubuntu-latest
@@ -20,8 +27,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
-      - name: Verify plot script from repo root
-        run: python scripts/generate_plots.py
+      - name: Verify plot script and SVG freshness
+        if: matrix.python-version == '3.12'
+        run: |
+          python scripts/generate_plots.py
+          git diff --exit-code plots/
 
   lean-check:
     runs-on: ubuntu-latest

@@ -45,7 +45,7 @@ result = ((a + b) * n_max_sq) // (n_max_sq + a * b)
 
 **Invariants:**
 - Closure: $0 \le a \oplus b \le N_{\max}$.
-- Low-scale correspondence: For $a, b \ge 1$ with $a, b \ll N_{\max}$, $\frac{a+b}{1 + ab/N_{\max}^2}$ is strictly less than $a + b$ by $< 1$, so the floor yields $a \oplus b = a + b - 1$ (relative error $\to 0$ as $N_{\max} \to \infty$); when $a = 0$ or $b = 0$, $a \oplus b = a + b$ exactly.
+- Low-scale correspondence: For $a, b \ge 1$ with $ab(a + b - 1) \le N_{\max}^2$, $\frac{a+b}{1 + ab/N_{\max}^2}$ lies strictly in $(a + b - 1, a + b)$, so floor quantization yields $a \oplus b = a + b - 1$ (relative error $\frac{1}{a+b}$, vanishing as $a + b \to \infty$ while $ab(a + b) \ll N_{\max}^2$); when $a = 0$ or $b = 0$, $a \oplus b = a + b$ exactly.
 - Horizon impenetrability: $N_{\max} \oplus b = N_{\max}$ for all $b \in \mathbb{P}$.
 
 ### 2.2 $\mathcal{P}$-Multiplication (`p_mul`)
@@ -90,7 +90,7 @@ Consequently, under strict floor quantization $\lfloor \cdot \rfloor$, $S(0) = 1
 | **Commutativity** ($a \oplus b = b \oplus a$) | Preserved | **Preserved** (symmetric numerator & denominator) |
 | **Identity** ($a \oplus 0 = a$) | Preserved | **Preserved** |
 | **Associativity** ($(a \oplus b) \oplus c = a \oplus (b \oplus c)$) | Preserved | **Broken** at large scales due to floor quantization |
-| **Cancellation** ($a \oplus c = b \oplus c \Rightarrow a = b$) | Preserved | **Broken** near $N_{\max}$ (horizon information loss) |
+| **Cancellation** ($a \oplus c = b \oplus c \Rightarrow a = b$) | Preserved | **Broken** universally ($0 \oplus c = 1 \oplus c = c$ for $c \ge 1$) and near $N_{\max}$ |
 | **Induction** | Unbounded | **Local** (holds only while $S(n) \neq n$) |
 
 ---
@@ -104,14 +104,14 @@ Without the floor function, repeated $\oplus$ converges to $\tanh$:
    - Local regime ($H \cdot d \ll c$): $v(d) \approx H \cdot d$.
    - Horizon regime: $v(d) \to c$ asymptotically.
 
-2. **Bounded Mass-Energy Equivalence (Eq. 5):** Setting $N_{\max} = E_{\max}$:
-   $$E_{\text{total}} = k \otimes (mc^2) \approx \left\lfloor E_{\max} \cdot \tanh\left(\frac{k \cdot mc^2}{E_{\max}}\right) \right\rfloor$$
-   - Everyday scale: $E = mc^2$.
-   - Extreme density: sub-linear growth, forbidding infinite energy/density singularities.
+2. **Bounded Mass-Energy Equivalence (Eq. 5):** Setting $N_{\max} = E_{\max}$ and adding $k$ particles of rest energy $mc^2$:
+   $$E_{\text{total}} = (mc^2) \otimes k \approx \left\lfloor E_{\max} \cdot \tanh\left(\frac{k \cdot mc^2}{E_{\max}}\right) \right\rfloor$$
+   - Everyday scale ($mc^2 \ll E_{\max}$): sub-linear floor shift of $k - 1$ units.
+   - Extreme density: saturates below $E_{\max}$, forbidding infinite energy/density singularities.
 
 3. **Discrete Cosmic Time (Section 5.3):**
    $$t_{\text{next}} = t \oplus 1$$
-   Asymptotically approaches a finite computational freeze at $N_{\max} \oplus 1 = N_{\max}$.
+   Under strict floor quantization, $0 \oplus 1 = 1$ and $t \oplus 1 = t$ for all $t \ge 1$ (immediate freeze at $t = 1$); under nearest-integer rounding, time advances until approaching $N_{\max}$.
 
 ---
 

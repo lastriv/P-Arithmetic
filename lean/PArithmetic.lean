@@ -114,8 +114,15 @@ theorem pAdd_cancellation_fails :
   refine ⟨⟨98, by decide⟩, ⟨99, by decide⟩, ⟨50, by decide⟩, ?_⟩
   decide
 
-/-- Theorem 6: Minimal associativity-breaking horizon is N = 6 (witnessed by (2, 2, 4)). -/
-theorem pAdd_not_associative_min :
+/-- Extensionality for `PNum`. -/
+theorem PNum.ext {N : Nat} {a b : PNum N} (h : a.val = b.val) : a = b := by
+  cases a
+  cases b
+  cases h
+  rfl
+
+/-- Theorem 6: Associativity breaks at N = 6 (witnessed by (2, 2, 4)). -/
+theorem pAdd_not_associative_n6 :
     ∃ a b c : PNum 6,
       (pAdd (by decide) (pAdd (by decide) a b) c).val ≠
       (pAdd (by decide) a (pAdd (by decide) b c)).val := by
@@ -128,12 +135,34 @@ theorem pSucc_zero {N : Nat} (hN : 0 < N) :
   simp only [pSucc, pAdd, Nat.zero_add, Nat.one_mul, Nat.zero_mul, Nat.add_zero]
   exact Nat.div_self (Nat.mul_pos hN hN)
 
-/-- Theorem 8: Successor at horizon is fixed (S(N) = N). -/
+/-- Theorem 8: Universal floor saturation of successor (S(n) = n for all 1 ≤ n ≤ N). -/
+theorem pSucc_eq_self {N : Nat} (hN : 0 < N) (n : PNum N) (hn : 1 ≤ n.val) :
+    (pSucc hN n).val = n.val := by
+  simp only [pSucc, pAdd, Nat.mul_one]
+  apply Nat.div_eq_of_lt_le
+  · have h_sq : n.val * n.val ≤ N * N := Nat.mul_le_mul n.h_bound n.h_bound
+    calc
+      n.val * (N * N + n.val) = n.val * (N * N) + n.val * n.val := Nat.mul_add _ _ _
+      _ ≤ n.val * (N * N) + N * N := Nat.add_le_add_left h_sq _
+      _ = (n.val + 1) * (N * N) := by rw [Nat.add_mul, Nat.one_mul]
+  · have h_pos : 0 < (n.val + 1) * n.val := Nat.mul_pos (Nat.succ_pos n.val) hn
+    calc
+      (n.val + 1) * (N * N) < (n.val + 1) * (N * N) + (n.val + 1) * n.val :=
+        Nat.lt_add_of_pos_right h_pos
+      _ = (n.val + 1) * (N * N + n.val) := (Nat.mul_add _ _ _).symm
+
+/-- Theorem 9: Successor at horizon is fixed (S(N) = N). -/
 theorem pSucc_horizon {N : Nat} (hN : 0 < N) :
     (pSucc hN ⟨N, Nat.le_refl N⟩).val = N :=
   pAdd_horizon_left hN ⟨1, hN⟩
 
-/-- Theorem 9: P-Multiplication by 0 on the left is 0 (0 (x) b = 0). -/
+/-- Theorem 10: Universal cancellation failure (0 (+) c = 1 (+) c for all c ≥ 1). -/
+theorem pAdd_cancellation_universal {N : Nat} (hN : 0 < N) (c : PNum N) (hc : 1 ≤ c.val) :
+    (pAdd hN ⟨0, Nat.zero_le N⟩ c).val = (pAdd hN ⟨1, hN⟩ c).val := by
+  rw [pAdd_zero_left, pAdd_comm]
+  exact (pSucc_eq_self hN c hc).symm
+
+/-- Theorem 11: P-Multiplication by 0 on the left is 0 (0 (x) b = 0). -/
 theorem pMul_zero_left {N : Nat} (hN : 0 < N) (b : Nat) :
     (pMul hN ⟨0, Nat.zero_le N⟩ b).val = 0 := by
   induction b with
@@ -146,7 +175,7 @@ theorem pMul_zero_left {N : Nat} (hN : 0 < N) (b : Nat) :
       rw [pAdd_zero_right]
       exact ih
 
-/-- Theorem 10: P-Multiplication of horizon N by positive b is N (N (x) b = N). -/
+/-- Theorem 12: P-Multiplication of horizon N by positive b is N (N (x) b = N). -/
 theorem pMul_horizon_left {N : Nat} (hN : 0 < N) (b : Nat) (hb : 0 < b) :
     (pMul hN ⟨N, Nat.le_refl N⟩ b).val = N := by
   cases b with
@@ -157,5 +186,18 @@ theorem pMul_horizon_left {N : Nat} (hN : 0 < N) (b : Nat) (hb : 0 < b) :
     | succ _ =>
       simp only [pMul]
       exact pAdd_horizon_right hN _
+
+/-- Theorem 13: Fixed-point soundness of early termination in `pMul`. -/
+theorem pMul_saturates {N : Nat} (hN : 0 < N) (a : PNum N) (k : Nat)
+    (h_fix : (pAdd hN (pMul hN a (k + 1)) a).val = (pMul hN a (k + 1)).val) :
+    ∀ m, (pMul hN a (k + 1 + m)).val = (pMul hN a (k + 1)).val := by
+  intro m
+  induction m with
+  | zero => rfl
+  | succ m ih =>
+    have h_eq : pMul hN a (k + 1 + m) = pMul hN a (k + 1) := PNum.ext ih
+    show (pAdd hN (pMul hN a (k + 1 + m)) a).val = (pMul hN a (k + 1)).val
+    rw [h_eq]
+    exact h_fix
 
 end PArithmetic

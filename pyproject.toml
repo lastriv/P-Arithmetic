@@ -7,7 +7,7 @@ name = "p-arithmetic"
 version = "0.1.0"
 description = "Physically Bounded Non-Associative Arithmetic (P-Arithmetic): Python reference implementation and specification"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { text = "CC-BY-4.0" }
 authors = [
   { name = "Ilya Radkevich", email = "ilya.v.radkevich@gmail.com" }
